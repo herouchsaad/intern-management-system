@@ -1,0 +1,27 @@
+# Fichiers/dossiers à ne PAS inclure dans l'image Docker du frontend
+
+# Dépendances Node (réinstallées dans le conteneur)
+node_modules/
+
+# Git
+.git/
+.gitignore
+
+# Variables d'environnement (passées comme ARG lors du build)
+.env
+.env.*
+
+# Build de production (généré dans le conteneur)
+build/
+
+# Fichiers de logs
+*.log
+npm-debug.log*
+
+# Fichiers OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/

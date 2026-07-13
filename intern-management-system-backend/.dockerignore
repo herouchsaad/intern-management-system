@@ -1,0 +1,29 @@
+# Fichiers/dossiers à ne PAS inclure dans l'image Docker du backend
+
+# Dépendances Node (réinstallées dans le conteneur)
+node_modules/
+
+# Git
+.git/
+.gitignore
+
+# Variables d'environnement sensibles (injectées via Docker Compose)
+.env
+
+# Fichiers uploadés par les utilisateurs (montés comme volume)
+src/uploads/
+
+# Code compilé (généré pendant le build Docker)
+dist/
+
+# Fichiers de développement
+*.log
+npm-debug.log*
+
+# Fichiers OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
