@@ -74,9 +74,10 @@ services:
       - "5000:5000"
 
     volumes:
-      # Volume persistant pour les fichiers uploadés (CVs, photos, documents)
-      # Ils survivent aux redémarrages et mises à jour de l'image
-      - uploads_data:/app/dist/src/uploads
+      # Bind mount vers le dossier local src/uploads
+      # ✅ Avantage : la photo issd_logo.png et tous les fichiers existants
+      #    sont directement accessibles sans copie manuelle dans un volume Docker
+      - ./intern-management-system-backend/src/uploads:/app/dist/src/uploads
 
     networks:
       - ims_network
@@ -132,10 +133,6 @@ services:
 volumes:
   postgres_data:
     name: ims_postgres_data
-    driver: local
-
-  uploads_data:
-    name: ims_uploads_data
     driver: local
 
 # ═══════════════════════════════════════════════════════════════════════════════

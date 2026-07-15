@@ -1,4 +1,8 @@
 import express from "express";
+import path from "path";
+import { fileURLToPath } from "url";
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 import http from "http";
 import bodyParser from "body-parser";
 import cors from "cors";
@@ -97,6 +101,13 @@ app.get("/health", (req, res) => res.sendStatus(200));
 
 //Teams router
 app.use("/api/teams", teamsRoute);
+
+// Route publique pour le logo (accessible sans authentification)
+// ⚠️ Doit être AVANT uploadRouter qui exige verifyJWT
+app.get("/uploads/photos/issd_logo.png", (req, res) => {
+  const logoPath = path.resolve(__dirname, "uploads", "photos", "issd_logo.png");
+  res.sendFile(logoPath);
+});
 
 //Uploads
 app.use("/uploads", uploadRouter);

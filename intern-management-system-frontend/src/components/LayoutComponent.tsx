@@ -263,7 +263,7 @@ useEffect(() => {
 
           <div className="logo-area" style={{marginLeft: "25px"}}>
             <Image width={150} height={150} style={{}} preview={false}
-            src={addAccessToken("/uploads/photos/issd_logo.png")} />  
+            src={"/uploads/photos/issd_logo.png"} />  
           </div>1
           
           <Menu theme="dark" defaultSelectedKeys={['/']} mode="inline" items={items} selectedKeys={[seletctedKey]}  onClick={({key}) => {
