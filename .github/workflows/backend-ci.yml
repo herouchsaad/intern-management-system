@@ -1,0 +1,43 @@
+name: Backend CI
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'intern-management-system-backend/**'
+      - '.github/workflows/backend-ci.yml'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'intern-management-system-backend/**'
+      - '.github/workflows/backend-ci.yml'
+
+jobs:
+  build:
+    name: Type-check & Docker Build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: intern-management-system-backend
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js 18
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: intern-management-system-backend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: TypeScript type check
+        run: npx tsc --noEmit
+
+      - name: Build Docker image
+        run: docker build -t ims-backend:ci .
