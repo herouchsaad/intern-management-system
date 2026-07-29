@@ -1,3 +1,4 @@
+<!-- test CD trigger -->
 # 🚀 Intern Management System (IMS)
 
 Une application complète de gestion des stagiaires avec backend Express, frontend React (servi par Nginx) et base de données PostgreSQL, entièrement dockerisée.
