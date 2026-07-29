@@ -111,7 +111,7 @@ services:
 
     ports:
       # Le frontend est accessible depuis le navigateur sur le port 80
-      - "80:80"
+      - "8080:80"
 
     networks:
       - ims_network
