@@ -44,6 +44,7 @@ const corsOptions = {
     'http://localhost',       // Frontend Docker (port 80)
     'http://localhost:80',
     "http://85.31.236.188",   // Serveur de production
+    "http://100.122.65.106:8080", // Tailscale - ubuntu1 direct access
   ],
   credentials: true, // Allow sending cookies and other credentials
 };
