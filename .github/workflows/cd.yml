@@ -25,4 +25,9 @@ jobs:
           key: ${{ secrets.VM_SSH_KEY }}
           command_timeout: 40m
           script: |
-            ssh -o StrictHostKeyChecking=no -i
+            ssh -o StrictHostKeyChecking=no -i ~/deploy_key ubuntu@172.24.4.122 '
+              cd ~/intern-management-system &&
+              git pull origin main &&
+              docker compose pull &&
+              docker compose up -d
+            '
