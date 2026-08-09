@@ -1,7 +1,7 @@
 # ═══════════════════════════════════════════════════════════════════════════════
 # docker-compose.yml — Intern Management System
 # Lance 3 services : db (PostgreSQL) + backend (Node.js) + frontend (React/Nginx)
-# Utilisation : docker-compose up --build
+# Utilisation : docker compose up -d (images pulled from ghcr.io, no local build)
 # ═══════════════════════════════════════════════════════════════════════════════
 
 services:
@@ -20,22 +20,16 @@ services:
       POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
 
     ports:
-      # Exposé uniquement pour le développement local (pgAdmin, DBeaver...)
-      # En production, supprimer cette ligne pour des raisons de sécurité
       - "5433:5432"
 
     volumes:
-      # Volume nommé pour persister les données entre les redémarrages
       - postgres_data:/var/lib/postgresql/data
-      # Script SQL d'initialisation : exécuté UNIQUEMENT au premier démarrage
-      # Crée toutes les tables (applications, users, interns, teams, etc.)
       - ./intern-management-system-backend/ims-tables.sql:/docker-entrypoint-initdb.d/init.sql:ro
 
     networks:
       - ims_network
 
     healthcheck:
-      # Vérifie que PostgreSQL est prêt à accepter des connexions
       test: ["CMD-SHELL", "pg_isready -U ${DATABASE_USER} -d ${DATABASE_NAME}"]
       interval: 10s
       timeout: 5s
@@ -46,37 +40,26 @@ services:
   # SERVICE 2 : Backend Node.js / Express
   # ─────────────────────────────────────────────────────────────────────────────
   backend:
-    build:
-      context: ./intern-management-system-backend
-      dockerfile: Dockerfile
+    image: ghcr.io/herouchsaad/intern-management-system-backend:latest
     container_name: ims_backend
     restart: unless-stopped
 
     environment:
-      # Identifiants JWT
       ACCESS_TOKEN_SECRET: ${ACCESS_TOKEN_SECRET}
       REFRESH_TOKEN_SECRET: ${REFRESH_TOKEN_SECRET}
-      # Base de données — pointe vers le service "db" du réseau Docker
       DATABASE_HOST: db
       DATABASE_PORT: 5432
       DATABASE_NAME: ${DATABASE_NAME}
       DATABASE_USER: ${DATABASE_USER}
       DATABASE_PASSWORD: ${DATABASE_PASSWORD}
-      # Optionnel : email et Google Calendar
       GMAIL_APP_PASSWORD: ${GMAIL_APP_PASSWORD}
       GOOGLE_CALENDAR_API_KEY: ${GOOGLE_CALENDAR_API_KEY}
-      # Environnement
       NODE_ENV: production
 
     ports:
-      # Exposé pour debug uniquement. En production, le frontend accède via le
-      # réseau Docker interne (pas besoin d'exposer ce port)
       - "5000:5000"
 
     volumes:
-      # Bind mount vers le dossier local src/uploads
-      # ✅ Avantage : la photo issd_logo.png et tous les fichiers existants
-      #    sont directement accessibles sans copie manuelle dans un volume Docker
       - ./intern-management-system-backend/src/uploads:/app/dist/src/uploads
 
     networks:
@@ -84,10 +67,9 @@ services:
 
     depends_on:
       db:
-        condition: service_healthy  # Attend que PostgreSQL soit prêt
+        condition: service_healthy
 
     healthcheck:
-      # Vérifie que le backend répond sur la route /health
       test: ["CMD-SHELL", "wget -qO- http://localhost:5000/health || exit 1"]
       interval: 10s
       timeout: 10s
@@ -98,19 +80,11 @@ services:
   # SERVICE 3 : Frontend React (servi par Nginx)
   # ─────────────────────────────────────────────────────────────────────────────
   frontend:
-    build:
-      context: ./intern-management-system-frontend
-      dockerfile: Dockerfile
-      args:
-        # Ces ARGs sont passés au moment du BUILD de l'image React
-        # Le proxy pointe vers "http://backend:5000" dans le réseau Docker
-        REACT_APP_PROXY: http://backend:5000
-        REACT_APP_API_KEY: ${GOOGLE_CALENDAR_API_KEY}
+    image: ghcr.io/herouchsaad/intern-management-system-frontend:latest
     container_name: ims_frontend
     restart: unless-stopped
 
     ports:
-      # Le frontend est accessible depuis le navigateur sur le port 80
       - "8080:80"
 
     networks:
@@ -118,7 +92,7 @@ services:
 
     depends_on:
       backend:
-        condition: service_healthy  # Attend que le backend soit prêt
+        condition: service_healthy
 
     healthcheck:
       test: ["CMD-SHELL", "wget -qO- http://localhost:80 || exit 1"]

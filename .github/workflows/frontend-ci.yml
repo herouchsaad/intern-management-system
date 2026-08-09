@@ -1,5 +1,4 @@
 name: Frontend CI
-
 on:
   push:
     branches:
@@ -13,33 +12,44 @@ on:
     paths:
       - 'intern-management-system-frontend/**'
       - '.github/workflows/frontend-ci.yml'
-
 jobs:
   build:
     name: Build & Docker Build
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
     defaults:
       run:
         working-directory: intern-management-system-frontend
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
       - name: Set up Node.js 18
         uses: actions/setup-node@v4
         with:
           node-version: '18'
           cache: 'npm'
           cache-dependency-path: intern-management-system-frontend/package-lock.json
-
       - name: Install dependencies
         run: npm ci
-
       - name: Build React app
         run: npm run build
         env:
           CI: false
-
+      - name: Log in to GitHub Container Registry
+        if: github.event_name == 'push'
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
       - name: Build Docker image
-        run: docker build -t ims-frontend:ci .
+        run: |
+          docker build \
+            --build-arg REACT_APP_PROXY=http://backend:5000 \
+            --build-arg REACT_APP_API_KEY=${{ secrets.GOOGLE_CALENDAR_API_KEY }} \
+            -t ghcr.io/${{ github.repository_owner }}/intern-management-system-frontend:latest .
+      - name: Push Docker image
+        if: github.event_name == 'push'
+        run: docker push ghcr.io/${{ github.repository_owner }}/intern-management-system-frontend:latest
