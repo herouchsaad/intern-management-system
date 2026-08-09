@@ -24,6 +24,7 @@ jobs:
           host: ${{ secrets.VM_TAILSCALE_IP }}
           username: ${{ secrets.VM_USER }}
           key: ${{ secrets.VM_SSH_KEY }}
+          command_timeout: 30m
           script: |
             ssh -o StrictHostKeyChecking=no -i ~/deploy_key ubuntu@172.24.4.122 '
               cd ~/intern-management-system &&
