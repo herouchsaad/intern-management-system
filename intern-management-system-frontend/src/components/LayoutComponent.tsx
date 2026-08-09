@@ -63,7 +63,7 @@ const [notifications, setNotifications] = useState<Notification []>();
 const axiosPrivate = useAxiosPrivate();
 const navigate = useNavigate();
 
-    const title = "Intern Management System - CD Retest";
+    const title = "Intern Management System - CD Retest2";
     const footer = "IMS ©2023"
 
 
